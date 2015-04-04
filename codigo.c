@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <time.h>
 
 /*
@@ -153,7 +152,7 @@ void insertar(NodoArbol** raiz, int digi, int* h) {
         }
     } else {
         /*Si el dato es igual a la raiz, entonces no se admite el digito*/
-        printf("¡Se ha ingresado un dígito incorrecto, por favor revise su archivo de entrada!");
+        printf(" ¡Se ha encontrado un número existente: %i, del metodo Inorden y Preorden!\n",digi);
         (*h) = 0;
     }
 }
@@ -161,7 +160,7 @@ void insertar(NodoArbol** raiz, int digi, int* h) {
 /*Metodo para Preorden*/
 void preorden(NodoArbol* raiz) {
     if (raiz) {
-        printf("%i, ", raiz->dato);
+        printf(" %i ", raiz->dato);
         preorden(raiz->Izq);
         preorden(raiz->Der);
     }
@@ -171,7 +170,7 @@ void preorden(NodoArbol* raiz) {
 void inorden(NodoArbol* raiz) {
     if (raiz) {
         inorden(raiz -> Izq);
-        printf("%i, ", raiz->dato);
+        printf(" %i ", raiz->dato);
         inorden(raiz -> Der);
     }
 
@@ -226,7 +225,6 @@ int contar() {
     return contador;
 }
 
-
 /*Metodo para bsucar*/
 NodoLista* buscar(int valor) {
     if (cabeza != NULL) {
@@ -242,23 +240,19 @@ NodoLista* buscar(int valor) {
 }
 
 /*Metodo para mostarar los elementos*/
-void mostrar()
-{
-    int  contador = 1;
-    if (cabeza != NULL)
-    {
+void mostrar() {
+    int contador = 1;
+    if (cabeza != NULL) {
         NodoLista *iterador = cabeza;
-        while (iterador != NULL)
-        {
-            printf("%i,",iterador->dato);
+        while (iterador != NULL) {
+            printf("%i ", iterador->dato);
             iterador = iterador ->siguiente;
-            contador = contador+1;
+            contador = contador + 1;
         }
-    }else
-    {
-    printf("La lista esta vacia");
+    } else {
+        printf("La lista esta vacia");
 
-       }
+    }
 }
 
 
@@ -295,6 +289,7 @@ void metodoBurbuja() {
 }
 
 /*Metodo de Ordenamiento QuickSort*/
+
 /*Se toma un elemento x de una posición cualquiera del arregloen este caso el centro.
 Se trata de ubicar a x en la posición correcta del arreglo, de tal forma que todos 
  * los elementos que se encuentran a su izquierda sean menores o iguales a x y todos 
@@ -310,7 +305,7 @@ void metodoQuick(NodoLista* a, int primero, int ultimo) {
     pivote = aa -> dato;
     i = primero;
     j = ultimo;
-    do {     
+    do {
         NodoLista* b = buscar(i);
         NodoLista* c = buscar(j);
         while (b ->dato < pivote) {
@@ -362,19 +357,59 @@ int main(int argc, char* argv[]) {
             }
             end = clock();
             tiempo_ingresar_arbol = ((double) (end - start)) / CLOCKS_PER_SEC;
-            printf("\n Ingresar árbol - %lf segundos \n", tiempo_ingresar_arbol);
-                        fclose(archivo);
-            
+            printf("\n Ingresar árbol - %lf segundos\n", tiempo_ingresar_arbol);
+            fclose(archivo);
+            /*Recorrido inorden*/
+            clock_t start1, end1;
+            double tiempo_recorrido_arbol;
+            start1 = clock();
+            printf(" Salida Inorden: ");
+            inorden(raiz);
+            end1 = clock();
+            tiempo_recorrido_arbol = ((double) (end1 - start1)) / CLOCKS_PER_SEC;
+            printf(" \n Recorrido arbol - %lf segundos", tiempo_recorrido_arbol);
 
+            /*Ordenamiento burbuja*/
+            archivo = fopen(nombreArchivo, "r");
+            while (feof(archivo) == 0) {
+                fscanf(archivo, "%d\n", &a);
+                insertarDato(a);
+            }
+            clock_t start2, end2;
+            double tiempo_burbuja;
+            start2 = clock();
+            metodoBurbuja();
 
+            end2 = clock();
+            tiempo_burbuja = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
+            printf("\n\n Ordenacion Burbuja - %lf segundos\n", tiempo_burbuja);
+            printf(" Salida del Metodo Ordenacion Burbuja: ");
+            mostrar();
+            fclose(archivo);
+            cabeza = fin = NULL;
+            indice = 0;
 
-
-
+            archivo = fopen(nombreArchivo, "r");
+            while (feof(archivo) == 0) {
+                fscanf(archivo, "%d\n", &a);
+                insertarDato(a);
+            }
+            clock_t start3, end3;
+            double tiempo_quicksort;
+            start3 = clock();
+            metodoQuick(cabeza, 0, fin->id);
+            end3 = clock();
+            tiempo_quicksort = ((double) (end3 - start3)) / CLOCKS_PER_SEC;
+            printf("\n\n Ordenacion Quicksort - %lf segundos\n", tiempo_quicksort);
+            printf(" Salida del Metodo Ordenacion Quicksort: ");
+            mostrar();
+            printf("\n\n");
+            fclose(archivo);
         }
     } else {
-        printf("\n Se necestia la direccion de archivo de entrada \n\n");
+        printf("\n Debe ingresar la dirección del archivo a Ordenar despues del archivo de compilación \n\n");
     }
-    
+
 
     return 0;
 }
