@@ -226,6 +226,7 @@ int contar() {
     return contador;
 }
 
+
 /*Metodo para bsucar*/
 NodoLista* buscar(int valor) {
     if (cabeza != NULL) {
@@ -241,19 +242,23 @@ NodoLista* buscar(int valor) {
 }
 
 /*Metodo para mostarar los elementos*/
-void mostrar() {
-    int contador = 1;
-    if (cabeza != NULL) {
+void mostrar()
+{
+    int  contador = 1;
+    if (cabeza != NULL)
+    {
         NodoLista *iterador = cabeza;
-        while (iterador != NULL) {
-            printf("%i,", iterador->dato);
+        while (iterador != NULL)
+        {
+            printf("%i,",iterador->dato);
             iterador = iterador ->siguiente;
-            contador = contador + 1;
+            contador = contador+1;
         }
-    } else {
-        printf("La lista esta vacia");
+    }else
+    {
+    printf("La lista esta vacia");
 
-    }
+       }
 }
 
 
@@ -290,7 +295,6 @@ void metodoBurbuja() {
 }
 
 /*Metodo de Ordenamiento QuickSort*/
-
 /*Se toma un elemento x de una posición cualquiera del arregloen este caso el centro.
 Se trata de ubicar a x en la posición correcta del arreglo, de tal forma que todos 
  * los elementos que se encuentran a su izquierda sean menores o iguales a x y todos 
@@ -306,7 +310,7 @@ void metodoQuick(NodoLista* a, int primero, int ultimo) {
     pivote = aa -> dato;
     i = primero;
     j = ultimo;
-    do {
+    do {     
         NodoLista* b = buscar(i);
         NodoLista* c = buscar(j);
         while (b ->dato < pivote) {
@@ -359,8 +363,8 @@ int main(int argc, char* argv[]) {
             end = clock();
             tiempo_ingresar_arbol = ((double) (end - start)) / CLOCKS_PER_SEC;
             printf("\n Ingresar árbol - %lf segundos \n", tiempo_ingresar_arbol);
-            fclose(archivo);
-
+                        fclose(archivo);
+            
 
 
 
@@ -370,7 +374,7 @@ int main(int argc, char* argv[]) {
     } else {
         printf("\n Se necestia la direccion de archivo de entrada \n\n");
     }
-
+    
 
     return 0;
 }
