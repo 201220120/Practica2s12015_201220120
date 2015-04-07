@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+
+#define GNUPLOT_PATH "/usr/bin/gnuplot"
 
 /*
  * 
@@ -152,7 +155,7 @@ void insertar(NodoArbol** raiz, int digi, int* h) {
         }
     } else {
         /*Si el dato es igual a la raiz, entonces no se admite el digito*/
-        printf(" ¡Se ha encontrado un número existente: %i, del metodo Inorden y Preorden!\n",digi);
+        printf(" ¡Se ha encontrado un número existente: %i, del metodo Inorden y Preorden!\n", digi);
         (*h) = 0;
     }
 }
@@ -335,6 +338,22 @@ void metodoQuick(NodoLista* a, int primero, int ultimo) {
     }
 }
 
+/*Metodo para graficar con GNuplot*/
+void graficar(char* graf, char* titulo) {
+    //printf("%s graficas" ,graf);
+    FILE *gp;
+    gp = popen(GNUPLOT_PATH, "w");
+    if (gp == NULL) {
+        fprintf(stderr, "No se encuentra %s", GNUPLOT_PATH);
+    } else {
+        fprintf(gp, "set title '%s' \n", titulo);
+        fprintf(gp, "%s \n", graf);
+        fflush(gp);
+        getchar();
+        pclose(gp);
+    }
+}
+
 /*Metodo main, el orden de entrada en con sola es /.a.out "Ruta del alchivo a analizar"*/
 int main(int argc, char* argv[]) {
     NodoArbol* raiz;
@@ -405,6 +424,41 @@ int main(int argc, char* argv[]) {
             mostrar();
             printf("\n\n");
             fclose(archivo);
+
+            printf("\n Grafica de comparacíon de tiempos:\n");
+            char* tmp2 = "plot log(x) title 'Caso Tipico log(n) ',log(x) title 'Caso Ideal log(n) ' ,x title 'Maximo Teorico n ' ,  ";
+            char TInOrden[900];
+            /*Se en ia como parametro el tiempo en que se reorre el arbol de forma inorden*/
+            sprintf(TInOrden, "%2.13f", tiempo_recorrido_arbol);
+            char* s1 = malloc(sizeof (char)*(2 * strlen(TInOrden) + strlen(tmp2) + 10));
+            strcpy(s1, tmp2);
+            strcat(s1, TInOrden);
+            char* titulo = "Metodo Inorden";
+            printf("\n Tiempo del Metodo Inorden: %2.13f segundos", tiempo_recorrido_arbol);
+            graficar(s1, titulo);
+            /*----------------------------------------------------------------------------------------------------------*/
+            /*caso tipico, caso ideal (mejor), maximo teorico (peor caso)*/
+            char* tmp3 = "plot x*x title 'Caso Tipico n^2 ', x title 'Caso Ideal n ', x*x title 'Maximo Teorico n^2 ', ";
+            char TBurbuja[900];
+            /*Se envia como parametro el tiempo del metodo de burbuja*/
+            sprintf(TBurbuja, "%2.13f", tiempo_burbuja);
+            char* s2 = malloc(sizeof (char)*(2 * strlen(TBurbuja) + strlen(tmp3) + 10));
+            strcpy(s2, tmp3);
+            strcat(s2, TBurbuja);
+            printf("\n Tiempo del Metodo Burbuja: %2.13f segundos", tiempo_burbuja);
+            titulo = "Metodo Ordenamiento Burbuja";
+            graficar(s2, titulo);
+            /*----------------------------------------------------------------------------------------------------------*/
+            char* tmp4 = "plot x*log(x) title 'Caso Tipico n*log(n) ', x*log(x) title 'Caso Ideal  n*log(n) ', x*x title 'Maximo Teorico n^2 ', ";
+            char TQuicksort[900];
+            /*Se envia como parametro el tiempo del metodo Quicksort*/
+            sprintf(TQuicksort, "%2.13f", tiempo_quicksort);
+            char* s3 = malloc(sizeof (char)*(2 * strlen(TQuicksort) + strlen(tmp4) + 10));
+            strcpy(s3, tmp4);
+            strcat(s3, TQuicksort);
+            printf("\n Tiempo del Metodo QuickSort: %2.13f segundos", tiempo_quicksort);
+            titulo = "Metodo Ordenamiento Quicksort";
+            graficar(s3, titulo);
         }
     } else {
         printf("\n Debe ingresar la dirección del archivo a Ordenar despues del archivo de compilación \n\n");
