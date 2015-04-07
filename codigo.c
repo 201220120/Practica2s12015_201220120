@@ -265,27 +265,15 @@ void mostrar() {
  verifica con el siguiente del dato actual, si este es mayo: modifica el dato actual por el
  dato siguiente, y el actual lo convierte en el siguiente, caso contrario: continua con las
  iteracion es hasta concluir el ciclo*/
-void metodoBurbuja() {
-    int aux;
-    int cambios = 0;
-    int control = 1;
-    int longitud = contar();
-    int i;
-    NodoLista* iterador;
-    while (control == 1) {
-        iterador = cabeza;
-        cambios = 0;
-        for (i = 1; i < longitud; i++) {
-            if (iterador->siguiente->dato < iterador->dato) {
-                aux = iterador->siguiente->dato;
-                iterador->siguiente->dato = iterador->dato;
-                iterador->dato = aux;
-                cambios = 1;
+void metodoBurbuja(int array[], int n) {
+    int i, j, temp;
+    for (i = 1; i < n; i++) {
+        for (j = 0; j < n - 1; j++) {
+            if (array[j] > array[j + 1]) {
+                temp = array[j];
+                array[j] = array[j + 1];
+                array[j + 1] = temp;
             }
-            iterador = iterador->siguiente;
-        }
-        if (cambios == 0) {
-            control = 0;
         }
     }
 
@@ -300,41 +288,44 @@ Se trata de ubicar a x en la posición correcta del arreglo, de tal forma que to
 Se repiten los pasos anteriores pero ahora para los conjuntos de datos que se encuentran 
  * a la izquierda y a la derecha de la posición correcta de x en el arreglo.*/
 
-void metodoQuick(NodoLista* a, int primero, int ultimo) {
-    int i, j, central;
+void metodoQuick(int array[], int primero, int ultimo) {
+    int i, j, tmp, central;
     int pivote;
     central = (primero + ultimo) / 2;
     NodoLista* aa = buscar(central);
-    pivote = aa -> dato;
+    pivote = primero;
     i = primero;
     j = ultimo;
-    do {
-        NodoLista* b = buscar(i);
-        NodoLista* c = buscar(j);
-        while (b ->dato < pivote) {
-            i++;
-            b = buscar(i);
+    if (primero < ultimo) {
+        // Asrignar el iníce del peimer elemento como el elemento pivote
+
+
+
+        // Ordenamos de forma ascendente con QuickSort
+        while (i < j) {
+            while (array[i] <= array[pivote] && i < ultimo) {
+                i++;
+            }
+            while (array[j] > array[pivote]) {
+                j--;
+            }
+
+            if (i < j) {
+                // Operación de Cambio
+                tmp = array[i];
+                array[i] = array[j];
+                array[j] = tmp;
+            }
         }
-        while (c->dato > pivote) {
-            j--;
-            c = buscar(j);
-        }
-        if (i <= j) {
-            int tmp;
-            NodoLista* d = buscar(i);
-            NodoLista* e = buscar(j);
-            tmp = d ->dato;
-            d->dato = e->dato;
-            e->dato = tmp;
-            i++;
-            j--;
-        }
-    } while (i <= j);
-    if (primero < j) {
-        metodoQuick(a, primero, j);
-    }
-    if (i < ultimo) {
-        metodoQuick(a, i, ultimo);
+
+        // Al final de la primera iteración, intercambiar el elemento pivote con el aux2
+        tmp = array[pivote];
+        array[pivote] = array[j];
+        array[j] = tmp;
+
+        // Llamada recursiva a QuickSort.
+        metodoQuick(array, primero, j - 1);
+        metodoQuick(array, j + 1, ultimo);
     }
 }
 
@@ -358,11 +349,16 @@ void graficar(char* graf, char* titulo) {
 int main(int argc, char* argv[]) {
     NodoArbol* raiz;
     raiz = NULL;
+    int array[2000000];
     int h;
     if (argc > 1) {
+
+
         FILE* archivo = NULL;
         char* nombreArchivo = argv[1];
         int a = 0;
+        int i = 0;
+        int n = 0;
         archivo = fopen(nombreArchivo, "r");
         if (archivo == NULL) {
             printf("\n ----Archivo no disponible \n\n");
@@ -370,10 +366,14 @@ int main(int argc, char* argv[]) {
             clock_t start, end;
             double tiempo_ingresar_arbol;
             start = clock();
+
             while (feof(archivo) == 0) {
                 fscanf(archivo, "%d\n", &a);
                 insertar(&raiz, a, &h);
+
+
             }
+            n = i;
             end = clock();
             tiempo_ingresar_arbol = ((double) (end - start)) / CLOCKS_PER_SEC;
             printf("\n Ingresar árbol - %lf segundos\n", tiempo_ingresar_arbol);
@@ -382,80 +382,139 @@ int main(int argc, char* argv[]) {
             clock_t start1, end1;
             double tiempo_recorrido_arbol;
             start1 = clock();
-            printf(" Salida Inorden: ");
+            printf(" Salida Inorden: \n");
             inorden(raiz);
             end1 = clock();
+
             tiempo_recorrido_arbol = ((double) (end1 - start1)) / CLOCKS_PER_SEC;
             printf(" \n Recorrido arbol - %lf segundos", tiempo_recorrido_arbol);
 
             /*Ordenamiento burbuja*/
+            i = 0;
+            int valorBurUltimo = 0;
+
             archivo = fopen(nombreArchivo, "r");
             while (feof(archivo) == 0) {
                 fscanf(archivo, "%d\n", &a);
                 insertarDato(a);
+                array[i] = a;
+                i++;
+                valorBurUltimo = a;
             }
+            n = i;
             clock_t start2, end2;
             double tiempo_burbuja;
             start2 = clock();
-            metodoBurbuja();
+            metodoBurbuja(array, n);
 
             end2 = clock();
             tiempo_burbuja = ((double) (end2 - start2)) / CLOCKS_PER_SEC;
             printf("\n\n Ordenacion Burbuja - %lf segundos\n", tiempo_burbuja);
-            printf(" Salida del Metodo Ordenacion Burbuja: ");
-            mostrar();
+            printf(" Salida del Metodo Ordenacion Burbuja: \n");
+
+            for (i = 0; i < n; i++) {
+                printf(" %i ", array[i]);
+
+            }
             fclose(archivo);
             cabeza = fin = NULL;
             indice = 0;
 
+            i = 0;
             archivo = fopen(nombreArchivo, "r");
             while (feof(archivo) == 0) {
                 fscanf(archivo, "%d\n", &a);
                 insertarDato(a);
+                array[i] = a;
+                i++;
             }
             clock_t start3, end3;
             double tiempo_quicksort;
             start3 = clock();
-            metodoQuick(cabeza, 0, fin->id);
+            metodoQuick(array, 0, fin->id);
             end3 = clock();
             tiempo_quicksort = ((double) (end3 - start3)) / CLOCKS_PER_SEC;
             printf("\n\n Ordenacion Quicksort - %lf segundos\n", tiempo_quicksort);
-            printf(" Salida del Metodo Ordenacion Quicksort: ");
-            mostrar();
+            printf(" Salida del Metodo Ordenacion Quicksort: \n");
+            for (i = 0; i < n; i++) {
+                printf(" %i ", array[i]);
+            }
+
             printf("\n\n");
             fclose(archivo);
+            char rango[80];
+            char rangoBur[80];
 
+            sprintf(rango, "%f", tiempo_recorrido_arbol);
+            sprintf(rangoBur, "%f", valorBurUltimo);
+            char* tmp11 = " plot [0:";
+            char* tmp12 = rangoBur;
+            char* tmp13 = "][0:";
+            char* tmp14 = rango;
             printf("\n Grafica de comparacíon de tiempos:\n");
-            char* tmp2 = "plot log(x) title 'Caso Tipico log(n) ',log(x) title 'Caso Ideal log(n) ' ,x title 'Maximo Teorico n ' ,  ";
+            char* tmp2 = "]log(x) title 'Caso Tipico log(n) ',log(x) title 'Caso Ideal log(n) ' ,x title 'Maximo Teorico n ' ,  ";
             char TInOrden[900];
             /*Se en ia como parametro el tiempo en que se reorre el arbol de forma inorden*/
             sprintf(TInOrden, "%2.13f", tiempo_recorrido_arbol);
             char* s1 = malloc(sizeof (char)*(2 * strlen(TInOrden) + strlen(tmp2) + 10));
-            strcpy(s1, tmp2);
+            strcpy(s1, tmp11);
+            strcat(s1, tmp12);
+            strcat(s1, tmp13);
+            strcat(s1, tmp14);
+            strcat(s1, tmp2);
             strcat(s1, TInOrden);
             char* titulo = "Metodo Inorden";
             printf("\n Tiempo del Metodo Inorden: %2.13f segundos", tiempo_recorrido_arbol);
             graficar(s1, titulo);
             /*----------------------------------------------------------------------------------------------------------*/
             /*caso tipico, caso ideal (mejor), maximo teorico (peor caso)*/
-            char* tmp3 = "plot x*x title 'Caso Tipico n^2 ', x title 'Caso Ideal n ', x*x title 'Maximo Teorico n^2 ', ";
+             sprintf(rango, "%f", tiempo_burbuja);
+            sprintf(rangoBur, "%f", valorBurUltimo);
+            char* tmp15 = " plot [0:";
+            char* tmp16 = rangoBur;
+            char* tmp17 = "][0:";
+            char* tmp18 = rango;
+            char* tmp3 = "] x*x title 'Caso Tipico n^2 ', x title 'Caso Ideal n ', x*x title 'Maximo Teorico n^2 ', ";
             char TBurbuja[900];
             /*Se envia como parametro el tiempo del metodo de burbuja*/
             sprintf(TBurbuja, "%2.13f", tiempo_burbuja);
             char* s2 = malloc(sizeof (char)*(2 * strlen(TBurbuja) + strlen(tmp3) + 10));
-            strcpy(s2, tmp3);
+            
+            strcpy(s2, tmp15);
+            strcat(s2, tmp16);
+            strcat(s2, tmp17);
+            strcat(s2, tmp18);
+            strcat(s2, tmp3);
             strcat(s2, TBurbuja);
             printf("\n Tiempo del Metodo Burbuja: %2.13f segundos", tiempo_burbuja);
             titulo = "Metodo Ordenamiento Burbuja";
             graficar(s2, titulo);
             /*----------------------------------------------------------------------------------------------------------*/
-            char* tmp4 = "plot x*log(x) title 'Caso Tipico n*log(n) ', x*log(x) title 'Caso Ideal  n*log(n) ', x*x title 'Maximo Teorico n^2 ', ";
+
+
+            // Convertimos a char nuestras variables
+            sprintf(rango, "%f", tiempo_burbuja);
+            sprintf(rangoBur, "%f", valorBurUltimo);
+            char* tmp7 = " plot [0:";
+            char* tmp8 = rangoBur;
+            char* tmp9 = "][0:";
+            char* tmp10 = rango;
+
+
+            char* tmp4 = "]x*log(x) title 'Caso Tipico n*log(n) ', x*log(x) title 'Caso Ideal  n*log(n) ', x*x title 'Maximo Teorico n^2 ', ";
             char TQuicksort[900];
             /*Se envia como parametro el tiempo del metodo Quicksort*/
             sprintf(TQuicksort, "%2.13f", tiempo_quicksort);
             char* s3 = malloc(sizeof (char)*(2 * strlen(TQuicksort) + strlen(tmp4) + 10));
-            strcpy(s3, tmp4);
+            strcpy(s3, tmp7);
+            strcat(s3, tmp8);
+
+            strcat(s3, tmp9);
+            strcat(s3, tmp10);
+
+            strcat(s3, tmp4);
             strcat(s3, TQuicksort);
+            
             printf("\n Tiempo del Metodo QuickSort: %2.13f segundos", tiempo_quicksort);
             titulo = "Metodo Ordenamiento Quicksort";
             graficar(s3, titulo);
